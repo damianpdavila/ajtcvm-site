@@ -1,0 +1,16 @@
+*.txt
+*.docx
+*.doc
+*.csv
+*.xlsx
+*.pdf
+*.jpg
+/.git/
+/copy/
+/ele-custom-skin/
+/hello-elementor/
+/hello-theme-child-master/images/
+/images/
+/journals/
+/operations/
+/research/

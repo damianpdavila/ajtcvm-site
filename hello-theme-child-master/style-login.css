@@ -1,0 +1,5 @@
+/* Style the default Wordpress login/logout page */
+
+body.login div#login h1 a {
+    background-image: url("images/AJTCVMLogoGold_180x180-150x150.png");
+}
