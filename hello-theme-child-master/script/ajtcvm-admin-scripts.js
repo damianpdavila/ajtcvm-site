@@ -48,8 +48,13 @@
 
                 // Gotta have a valid price
                 let price = document.querySelector("#edd_regular_price_field input.edd-price-field").value;
-                if (price == "" || isNaN(price)) {
+                if (price == "" || isNaN(Number(price))) {
                     showError('Download Price Error:  Please enter a numeric price.', event, TYPE_PRICE);
+                }
+                // EDD does not store the price in database if == 0 (!?). But custom DB query for free articles depends on having price in DB (duh).
+                // Therefore force "0.00" price if equal to 0 value.
+                if (Number(price) == 0) {
+                    document.querySelector("#edd_regular_price_field input.edd-price-field").value = "0.00";
                 }
 
                 // Validate the categories
