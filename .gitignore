@@ -5,6 +5,8 @@
 *.xlsx
 *.pdf
 *.jpg
+*.png
+*.odt
 /.git/
 /copy/
 /ele-custom-skin/
