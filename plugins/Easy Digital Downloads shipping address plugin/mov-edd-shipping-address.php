@@ -36,7 +36,6 @@ function mov_edd_shipping_address_required() {
     // Download categories defined for physical shipping -- TODO: add plugin settings panel in dashboard to define instead of hardcoding here.
 	$categories_to_search = array( 'print-journal' );
 
-	// get our cart contents
 	$cart = edd_get_cart_contents();
 
 	if ( $cart ) {
