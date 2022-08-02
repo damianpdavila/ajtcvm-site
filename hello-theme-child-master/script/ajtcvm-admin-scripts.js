@@ -35,9 +35,9 @@
 
             // If adding new download, clear price field to ensure a valid numeric value is entered here; 
             // otherwise EDD will default to 0.00, and want to ensure 0.00 was actually intended.
-            if (document.querySelector('form#post input[type="submit"][name="publish"]')) {
-                document.querySelector("#edd_regular_price_field input.edd-price-field").value = "";
-            }
+            // if (document.querySelector('form#post input[type="submit"][name="publish"]')) {
+            //     document.querySelector("#edd_regular_price_field input.edd-price-field").value = "";
+            // }
 
             // Disable the category checkbox for "Publication Year" parent category as we don't want them to check it off.
             jQuery('#in-download_category-82').prop('disabled', true);
