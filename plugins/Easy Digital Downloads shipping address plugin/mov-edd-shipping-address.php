@@ -119,8 +119,8 @@ add_filter( 'edd_payment_meta', 'mov_edd_store_custom_fields');
  * Add the shipping address to the "View Order Details" page
  */
 function mov_edd_view_order_details( $payment_meta, $user_info ) {
-    if ( isset( $payment_meta['ship_addr'] )) {
-        $ship_addr = isset( $payment_meta['ship_addr'] ) ? $payment_meta['ship_addr'] : 'none';
+    if ( isset($payment_meta['ship_addr']) && strlen(trim($payment_meta['ship_addr'])) > 0 ) {
+        $ship_addr = $payment_meta['ship_addr'];
 ?>
     
     <div class="column-container">    
@@ -155,8 +155,14 @@ add_action( 'edd_add_email_tags', 'mov_edd_add_email_tag' );
  * The {ship_addr} email tag
  */
 function mov_edd_email_tag_ship_addr( $payment_id ) {
-    $payment_data = edd_get_payment_meta( $payment_id );
-    return $payment_data['ship_addr'];
+    $payment_meta = edd_get_payment_meta( $payment_id );
+    return $payment_meta['ship_addr'];
+    //$edd_shipping_info = "Meta from EDD: " . print_r($payment_meta, true);
+    //$payment = new EDD_Payment( $payment_id );
+    //$payment_info = print_r($payment, true);
+    //$wp_meta = $payment->get_meta( '_edd_payment_meta', true );
+    //$wp_shipping_info = "Meta from WP: " . print_r($wp_meta, true);
+    //return "Payment id: " . print_r($payment_id, true) . "<br>\n" . $payment_info . "<br>\n" . $edd_shipping_info . "<br>\n" . $wp_shipping_info;
 }
 
 ?>
