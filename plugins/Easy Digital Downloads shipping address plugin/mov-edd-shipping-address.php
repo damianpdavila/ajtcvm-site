@@ -119,7 +119,8 @@ add_filter( 'edd_payment_meta', 'mov_edd_store_custom_fields');
  * Add the shipping address to the "View Order Details" page
  */
 function mov_edd_view_order_details( $payment_meta, $user_info ) {
-    $ship_addr = isset( $payment_meta['ship_addr'] ) ? $payment_meta['ship_addr'] : 'none';
+    if ( isset( $payment_meta['ship_addr'] )) {
+        $ship_addr = isset( $payment_meta['ship_addr'] ) ? $payment_meta['ship_addr'] : 'none';
 ?>
     
     <div class="column-container">    
@@ -136,7 +137,8 @@ function mov_edd_view_order_details( $payment_meta, $user_info ) {
     
     </div>
 
-    <?php
+    <?php 
+    }
 }
 add_action( 'edd_payment_personal_details_list', 'mov_edd_view_order_details', 10, 2 );
 
