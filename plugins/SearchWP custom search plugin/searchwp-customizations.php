@@ -160,7 +160,14 @@ add_filter( 'searchwp\source\post\global_excerpt_break', 'mov_search_excerpt_sup
 // @link https://searchwp.com/documentation/hooks/searchwp-query-logic-and-token_threshold/
 // Provided by SearchWP support in response to support ticket #fc16524a5d
 
-add_filter( 'searchwp\query\logic\and\token_threshold', '__return_false' );
+// 29Aug2022: Long-running queries were overloading database server and killing the site.  
+// Per Elio from SearchWP support: "If the server has issues even with this then you should lower the value. The default value is 5 and you should not go lower than that."
+// Provided by SearchWP support in response to support ticket #7748a517f1
+
+//add_filter( 'searchwp\query\logic\and\token_threshold', '__return_false' );
+add_filter( 'searchwp\query\logic\and\token_threshold', function( $threshold ) {
+	return 10;
+} );
 
 /**
  * Modify search results order to bubble up article results above all others (principally the journals).
