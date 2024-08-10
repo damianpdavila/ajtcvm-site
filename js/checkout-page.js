@@ -1,16 +1,22 @@
-(function() {
+(function () {
 
-    if (window.addEventListener) {
-        // For standards-compliant web browsers
-        window.addEventListener("load", catchLoginErrorMessage, false);
-    } else {
-        window.attachEvent("onload", catchLoginErrorMessage);
+    const catchLoginErrorMessage = () => {
+        // Watch for the error message
+
+        const observer = new MutationObserver( swapMessage );
+
+        observer.observe(
+            document.getElementById("edd-paypal-errors-wrap"),
+            {
+                childList: true,
+            }
+        );
     }
 
-
-    function catchLoginErrorMessage() {
-
-        const eleErrMsg = document.getElementById("edd_error_edd_recurring_login");
+    const swapMessage = (mutationsList = null, observer = null) => {
+        const eleErrMsg = document.getElementById(
+            "edd_error_edd_recurring_login"
+        );
 
         if (eleErrMsg) {
             const replacementErrorMsg =
@@ -21,10 +27,19 @@
 
             eleErrMsg.innerHTML = replacementErrorMsg;
             setTimeout(() => {
-                eleErrMsg.scrollIntoView({ behavior: "smooth", block: "center" });
+                eleErrMsg.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
             }, 500);
         }
+    };
 
+    if (window.addEventListener) {
+        // For standards-compliant web browsers
+        window.addEventListener("load", catchLoginErrorMessage, false);
+    } else {
+        window.attachEvent("onload", catchLoginErrorMessage);
     }
 
 })();
