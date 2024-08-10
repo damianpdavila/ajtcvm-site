@@ -2,7 +2,7 @@
 
 /*
 Plugin Name:  Moventis EDD Shortcodes
-Version: 1.1
+Version: 1.2
 Description: Simple WP access to Easy Digital Downloads functions not available out of the box.
 Author: Damian Davila
 Author URI: https://www.moventisusa.com/
@@ -28,21 +28,38 @@ Text Domain: moventis
 
 add_shortcode( 'mov_edd_cart_count', 'mov_edd_get_cart_count' );
 
+// Forces updating the cookie when an item is added.  Necessary when subsequent page is cached and the function won't otherwise be called.
+// Refer to https://spinupwp.com/page-caching-personalized-dynamic-content/
+add_action( 'edd_post_add_to_cart', 'mov_edd_get_cart_count' );
+
 function mov_edd_get_cart_count($atts) {
 
+    if ( headers_sent() || ! function_exists( 'edd_get_cart_quantity' ) ) {
+        return;
+    }
+
+    $cart_qty = (int)edd_get_cart_quantity();
+
+    // Set cart quantity in cookie to be referenced on cached pages so that the visible cart count is always accurate.
+    $cart = array(
+        'quantity' => $cart_qty,
+    );
+    setcookie( 'edd_cart', json_encode( $cart ), time() + 30 * 60, '/', $_SERVER['HTTP_HOST'] );
+
+    // Do the actual shortcode processing
     $params = shortcode_atts( array(
         'tagname' => 'span'
         ), $atts );
 
     $tag_name = esc_attr($params['tagname']);
 
-    if ( (int)edd_get_cart_quantity() > 0 ) {
+    if ( $cart_qty > 0 ) {
         $tag_class = 'edd-cart-quantity edd-cart-loaded';
     } else {
         $tag_class = 'edd-cart-quantity';
     }
     
-    return "<" . $tag_name . " class='" . $tag_class . "'>" . edd_get_cart_quantity() . "</" . $tag_name . ">";    
+    return "<" . $tag_name . " class='" . $tag_class . "'>" . strval($cart_qty) . "</" . $tag_name . ">";    
     
 };
 
