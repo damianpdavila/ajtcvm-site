@@ -2,7 +2,7 @@
 
 /*
 Plugin Name:  Moventis EDD Shipping Address
-Version: 1.0
+Version: 1.1
 Description: Adds shipping address to EDD downloads which contain a specific category.
 Author: Damian Davila
 Author URI: https://www.moventisusa.com/
@@ -62,7 +62,11 @@ function mov_edd_display_checkout_fields() {
     if ( mov_edd_shipping_address_required()) {
 ?>
     <p id="edd-ship-addr-wrap">
-        <label class="edd-label" for="edd-ship-addr">Shipping Address</label>
+        <label class="edd-label" for="edd-ship-addr">Shipping Address
+        <?php if ( edd_field_is_required( 'edd_ship_addr' ) ) : ?>
+			<span class="edd-required-indicator">*</span>
+		<?php endif; ?>
+        </label>
         <span class="edd-description"> Enter your full shipping address where we should ship the printed journal. </span>
         <textarea class="edd-input" type="text" name="edd_ship_addr" id="edd-ship-addr" rows="5"></textarea>
     </p>
@@ -102,29 +106,55 @@ function mov_edd_validate_checkout_fields( $valid_data, $data ) {
 add_action( 'edd_checkout_error_checks', 'mov_edd_validate_checkout_fields', 10, 2 );
 
 /**
- * Store the custom field data into EDD's payment meta
+ * Store the custom field data into EDD's order mtea
  */
-function mov_edd_store_custom_fields( $payment_meta ) {
+function mov_edd_store_custom_fields( $order_id, $order_data ) {
 
-    if ( 0 !== did_action('edd_pre_process_purchase') ) {
-        $payment_meta['ship_addr'] = isset( $_POST['edd_ship_addr'] ) ? sanitize_textarea_field( $_POST['edd_ship_addr'] ) : '';
-    }
+	if ( 0 !== did_action('edd_pre_process_purchase') ) {
+		$ship_addr = isset( $_POST['edd_ship_addr'] ) ? sanitize_textarea_field( $_POST['edd_ship_addr'] ) : '';
+		edd_add_order_meta( $order_id, 'ship_addr', $ship_addr );
+	}
 
-    return $payment_meta;
 }
-add_filter( 'edd_payment_meta', 'mov_edd_store_custom_fields');
+add_action( 'edd_built_order', 'mov_edd_store_custom_fields', 10, 2 );
+
 
 
 /**
- * Add the shipping address to the "View Order Details" page
+ * Add the shipping address to the "View Order Details" page, new approach stored in order meta
  */
-function mov_edd_view_order_details( $payment_meta, $user_info ) {
+function mov_edd_view_order_details( $order_id ) {
+	$ship_addr = edd_get_order_meta( $order_id, 'ship_addr', true );
+    if ( isset($ship_addr) && strlen(trim($ship_addr)) > 0 ) {
+?>
+    <div class="column-container">    
+        <div class="column" style="border: 2px solid red; padding-left: 1em;"> 
+            <p><strong>NOTE:  This order contains a printed journal and must be shipped:</strong><br/>
+            </p>
+        </div>
+
+        <div class="column"> 
+            <p><strong>Shipping Address: </strong><br/>
+                <?php echo $ship_addr; ?> 
+            </p>
+        </div>
+    
+    </div>
+<?php
+    }
+}
+add_action( 'edd_payment_view_details', 'mov_edd_view_order_details', 10, 1 );
+
+/**
+ * Add the shipping address to the "View Order Details" page, old approach stored in payment meta
+ */
+function mov_edd_view_order_details_old( $payment_meta, $user_info ) {
     if ( isset($payment_meta['ship_addr']) && strlen(trim($payment_meta['ship_addr'])) > 0 ) {
         $ship_addr = $payment_meta['ship_addr'];
 ?>
     
     <div class="column-container">    
-        <div class="column" style="border: 2px solid red;"> 
+        <div class="column" style="border: 2px solid red; padding-left: 1em;"> 
             <p><strong>NOTE:  This order contains a printed journal and must be shipped:</strong><br/>
             </p>
         </div>
@@ -140,7 +170,7 @@ function mov_edd_view_order_details( $payment_meta, $user_info ) {
     <?php 
     }
 }
-add_action( 'edd_payment_personal_details_list', 'mov_edd_view_order_details', 10, 2 );
+add_action( 'edd_payment_personal_details_list', 'mov_edd_view_order_details_old', 10, 2 );
 
 /**
  * Add a {ship_addr} tag for use in either the purchase receipt email or admin notification emails
@@ -154,15 +184,23 @@ add_action( 'edd_add_email_tags', 'mov_edd_add_email_tag' );
 /**
  * The {ship_addr} email tag
  */
+// function mov_edd_email_tag_ship_addr( $payment_id ) {
+//     $payment_meta = edd_get_payment_meta( $payment_id );
+//     return $payment_meta['ship_addr'];
+//     //$edd_shipping_info = "Meta from EDD: " . print_r($payment_meta, true);
+//     //$payment = new EDD_Payment( $payment_id );
+//     //$payment_info = print_r($payment, true);
+//     //$wp_meta = $payment->get_meta( '_edd_payment_meta', true );
+//     //$wp_shipping_info = "Meta from WP: " . print_r($wp_meta, true);
+//     //return "Payment id: " . print_r($payment_id, true) . "<br>\n" . $payment_info . "<br>\n" . $edd_shipping_info . "<br>\n" . $wp_shipping_info;
+// }
+
+/**
+ * The {ship_addr} email tag
+ */
 function mov_edd_email_tag_ship_addr( $payment_id ) {
-    $payment_meta = edd_get_payment_meta( $payment_id );
-    return $payment_meta['ship_addr'];
-    //$edd_shipping_info = "Meta from EDD: " . print_r($payment_meta, true);
-    //$payment = new EDD_Payment( $payment_id );
-    //$payment_info = print_r($payment, true);
-    //$wp_meta = $payment->get_meta( '_edd_payment_meta', true );
-    //$wp_shipping_info = "Meta from WP: " . print_r($wp_meta, true);
-    //return "Payment id: " . print_r($payment_id, true) . "<br>\n" . $payment_info . "<br>\n" . $edd_shipping_info . "<br>\n" . $wp_shipping_info;
+	$ship_addr = edd_get_order_meta( $payment_id, 'ship_addr', true );
+	return $ship_addr;
 }
 
 ?>
