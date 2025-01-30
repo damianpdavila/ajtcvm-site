@@ -40,7 +40,7 @@
             // }
 
             // Disable the category checkbox for "Publication Year" parent category as we don't want them to check it off.
-            jQuery('#in-download_category-82').prop('disabled', true);
+            jQuery('#in-download_category-82-1 input[value=82]').prop('disabled', true);
 
             jQuery('form#post input[type="submit"]').click((event) => {
 
@@ -73,42 +73,42 @@
                     return;
                 }
                 // Skip remaining checks if this download is a subscription
-                if (jQuery('#in-download_category-15:checked').length == 1) {
+                if (jQuery('#in-download_category-15-1 input:checked').length == 1) {
                     return;
                 }
                 // Cannot be both article and journal  
-                if (jQuery('#in-download_category-16:checked').length == 1 && jQuery('#in-download_category-10:checked').length == 1) {
+                if (jQuery('#in-download_category-16-1 input[value=16]:checked').length == 1 && jQuery('#in-download_category-10-1 input[value=10]:checked').length == 1) {
                     showError('Download Category Error:  Please pick only one: Articles or Journals', event, TYPE_CATEGORY);
                     return;
                 }
                 // If this is an article (parent category), it must have one and only one article type (child category)
-                if (jQuery('#in-download_category-16:checked').length == 1) {
+                if (jQuery('#in-download_category-16-1 input[value=16]:checked').length == 1) {
 
-                    if (jQuery('#download_category-16 ul.children input:checked').length == 1) {;
+                    if (jQuery('#in-download_category-16-1 ul.children input:checked').length == 1) {;
                     } else {
                         showError('Download Category Error:  If you choose the Articles parent category, you must pick one and only one article type, e.g. Case Studies, Pearls, etc.', event, TYPE_CATEGORY);
                         return;
                     }
                 }
                 // If article type selected (child category), must select Articles (parent category)
-                if (jQuery('#download_category-16 ul.children input:checked').length > 0) {
+                if (jQuery('#in-download_category-16-1 ul.children input:checked').length > 0) {
 
-                    if (jQuery('#in-download_category-16:checked').length == 1) {;
+                    if (jQuery('#in-download_category-16-1 input[value=16]:checked').length == 1) {;
                     } else {
                         showError('Download Category Error:  If you choose an article type, e.g. Case Studies, Pearls, etc., you must also tick the Articles parent category.', event, TYPE_CATEGORY);
                         return;
                     }
                 }
                 // Must have one and only one publication year selected
-                if (jQuery('#download_category-82 ul.children input:checked').length == 1) {;
+                if (jQuery('#in-download_category-82-1 ul.children input:checked').length == 1) {;
                 } else {
                     showError('Download Category Error:  You must pick one and only one year of publication, e.g., 2006.', event, TYPE_CATEGORY);
                     return;
                 }
                 // Do not select the Publication Year parent category
-                if (jQuery('#in-download_category-82:checked').length == 1) {
+                if (jQuery('#in-download_category-82-1 input[value=82]:checked').length == 1) {
 
-                    jQuery('#in-download_category-82').prop("checked", false);
+                    jQuery('#in-download_category-82-1 input[value=82]').prop("checked", false);
                     showError('Download Category informational reminder:  Please do not select the parent "Publication Year" category, only an individual child year under that.', null, TYPE_CATEGORY);
                     return;
                 }
